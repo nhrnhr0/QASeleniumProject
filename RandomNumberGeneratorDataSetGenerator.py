@@ -5,7 +5,7 @@ genNums = [1,3,20]
 allowDup = [True,False]
 sortType = ['Ascend','Decend', 'None']
 useIntType = [True, False]
-precision = [22]
+precision = [1,22,99]
 
 all = [bounds,genNums,allowDup, sortType, useIntType,precision]
 allList = list(itertools.product(*all))

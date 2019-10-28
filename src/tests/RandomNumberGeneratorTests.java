@@ -1,6 +1,8 @@
 package tests;
 
 import org.testng.annotations.Test;
+import org.testng.asserts.IAssert;
+import org.testng.asserts.SoftAssert;
 
 import pages.RNGPage;
 
@@ -32,9 +34,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*; 
 import java.io.*; 
 
-public class RandomNumberGeneratorTests {
-	ChromeDriver driver;
+public class RandomNumberGeneratorTests extends BaseTest {
+	private int testCount;
 	RNGPage page;
+	
+    @BeforeSuite
+    public void beforeSuite() {
+  	  page = new RNGPage(driver);
+    }
 	
 	
   @BeforeMethod
@@ -46,20 +53,16 @@ public class RandomNumberGeneratorTests {
   @Test(dataProvider = "RandomNumberGeneratorDataProvider")
   public void RandomNumberGeneratorTest(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
 		  						   String sortType, boolean useIntType, String precision) {
+	  ++testCount;
+	  LogTest(pLowerLimit, pUpperLimit,pGenerateNum, allowDup, sortType, useIntType, precision, testCount);
 	  fillFeilds(pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision);
-	  try {
-		Thread.sleep(100);
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
 	  page.submit();
-	  
 	  List<WebElement> results = page.getResults();
 	  
-	  Assert.assertEquals(results.size(), pGenerateNum, "incorrct number of results: "); // verify the number of results
+	  // verify the number of results
+	  sa.assertEquals(results.size(), pGenerateNum, "incorrect number of results: "); 
 	  
-	  
+	  		
 	  boolean isAscend = true;
 	  boolean isDescend = true;
 	  for(int i = 0; i < results.size();i++) {
@@ -69,6 +72,13 @@ public class RandomNumberGeneratorTests {
 		  if(pLowerLimit > currResult || pUpperLimit < currResult) {
 			  FaildAssert("result: " + String.valueOf(currResult) + " is out of bounds: " + pLowerLimit + " - " + pUpperLimit);
 		  }
+		  
+		  // test precision
+		  if(!useIntType) {
+			  String afterPoint = results.get(i).getText().substring(results.get(i).getText().indexOf(".")+1);
+			  Assert.assertEquals(afterPoint.length(), Double.parseDouble(precision));
+		  }
+		  
 		  
 		  
 		  // if(not in the last result)
@@ -82,7 +92,7 @@ public class RandomNumberGeneratorTests {
 				  //isAscend = false;
 				  Assert.assertEquals(sortType.contentEquals("Ascend")?true:false, false, "the result is not in ascending order");
 				  
-			  } // if all the results are equal then the sort is ascend and descend
+			  }
 			  
 			  // iterate all the next results to find match results for dup test
 			  if(!allowDup) {
@@ -97,14 +107,14 @@ public class RandomNumberGeneratorTests {
 			  
 		  } // done if(not in the last result) 
 	  } // done iterate results 
-	  
-	  // test sort type if size above 1:
-	  if(pGenerateNum > 1) {
-		  // resultSortType = "Ascend"/"Descend"/"None"
-		  //String resultSortType = isAscend? "Ascend":isDescend?"Descend":"None";
-		  //Assert.assertEquals(resultSortType, sortType, "result sort: " + resultSortType + " requested: " + sortType);
-	  }
-	  
+	  Log.FlushInfo("testLog", "[PASSED]");
+  } // done test
+  
+  private void LogTest(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
+			   String sortType, boolean useIntType, String precision, int testCount) {
+	  //Log.Info				("RandomNumberGeneratorTest	|Indx|  low  | high  |  num |  dup  |  sort  | type  | per.  |");
+	  Log.Info("testLog", String.format("RandomNumberGeneratorTest:| %-6d|%s% -4.2f |%s% -4.2f | %-5d|%s|%-6s| %s  |%-5s|",
+			  testCount,pLowerLimit>0?" ":"", pLowerLimit, pUpperLimit>0?" ":"",pUpperLimit, pGenerateNum,allowDup?"true ":"false",sortType,useIntType?"int":"dec", precision));
   }
   
   private void FaildAssert(String msg) {
@@ -146,7 +156,8 @@ public class RandomNumberGeneratorTests {
 
   @DataProvider
   public Object[][] RandomNumberGeneratorDataProvider() {
-	  List<String> lines = readFileInList("RandomNumberGeneratorDataSet.txt");
+	  final String filename =  "RandomNumberGeneratorDataSet.txt";
+	  List<String> lines = readFileInList(filename);
 	  Object[][] ret = new Object[lines.size()][7];
 	  for(int i = 0;i < lines.size();i++) {
 		  String line = lines.get(i);
@@ -161,7 +172,8 @@ public class RandomNumberGeneratorTests {
 		  ret[i][5] = feilds[5].contentEquals("True") ? true: false; // useIntType, if false then use decimal
 		  ret[i][6] = feilds[6]; // precision
 	  }
-	  
+	  //System.out.println("read " + ret.length + " TC from " + filename);
+	  Log.FlushInfo("title", " " + ret.length + " TCs in: " + filename);
     return ret;
   }
     
@@ -185,15 +197,13 @@ public class RandomNumberGeneratorTests {
       return lines; 
     }
     
-  @BeforeSuite
-  public void beforeSuite() {
-	  driver = new ChromeDriver();
-	  page = new RNGPage(driver);
-  }
+    @BeforeTest
+    public void beforeTest() {
+    	testCount = 0;
+    	Log.Info("title", "RandomNumberGeneratorTest:|  Indx |   low  |  high  |  num | dup | sort | type | per.|");
+    }
+    
 
-  @AfterSuite
-  public void afterSuite() {
-	  driver.close();
-  }
 
+  
 }
