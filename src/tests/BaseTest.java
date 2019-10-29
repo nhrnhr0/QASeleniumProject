@@ -19,14 +19,14 @@ public class BaseTest {
     public void bestTestBeforeSuite() {
 		System.setProperty("webdriver.chrome.driver","chromedriver.exe");
 		driver = new ChromeDriver();
-		Log.FlushInfo("driver initialize");
+		Log.println("driver initialize");
 
 	}
 	
 	@AfterSuite
 	  public void afterSuite() {
 		  driver.close();
-		  Log.FlushInfo("driver closed");
+		  Log.println("driver closed");
 	  }
 
 	

@@ -54,7 +54,10 @@ public class RandomNumberGeneratorTests extends BaseTest {
   public void RandomNumberGeneratorTest(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
 		  						   String sortType, boolean useIntType, String precision) {
 	  ++testCount;
-	  LogTest(pLowerLimit, pUpperLimit,pGenerateNum, allowDup, sortType, useIntType, precision, testCount);
+	  //LogTest(pLowerLimit, pUpperLimit,pGenerateNum, allowDup, sortType, useIntType, precision, testCount);
+	  Log.println(formatTestPars(
+			  pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision, testCount)
+			  + "[RUNNING]");
 	  fillFeilds(pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision);
 	  page.submit();
 	  List<WebElement> results = page.getResults();
@@ -107,14 +110,17 @@ public class RandomNumberGeneratorTests extends BaseTest {
 			  
 		  } // done if(not in the last result) 
 	  } // done iterate results 
-	  Log.FlushInfo("testLog", "[PASSED]");
+	  Log.println(formatTestPars(
+			  pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision, testCount)
+			  + "[PASSED]");
   } // done test
   
-  private void LogTest(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
+  private String formatTestPars(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
 			   String sortType, boolean useIntType, String precision, int testCount) {
-	  //Log.Info				("RandomNumberGeneratorTest	|Indx|  low  | high  |  num |  dup  |  sort  | type  | per.  |");
-	  Log.Info("testLog", String.format("RandomNumberGeneratorTest:| %-6d|%s% -4.2f |%s% -4.2f | %-5d|%s|%-6s| %s  |%-5s|",
-			  testCount,pLowerLimit>0?" ":"", pLowerLimit, pUpperLimit>0?" ":"",pUpperLimit, pGenerateNum,allowDup?"true ":"false",sortType,useIntType?"int":"dec", precision));
+	  
+	  String testStr = String.format("RandomNumberGeneratorTest:| %-6d|%s% -4.2f |%s% -4.2f | %-5d|%s|%-6s| %s  |%-5s|",
+			  testCount,pLowerLimit>0?" ":"", pLowerLimit, pUpperLimit>0?" ":"",pUpperLimit, pGenerateNum,allowDup?"true ":"false",sortType,useIntType?"int":"dec", precision);
+	  return testStr;
   }
   
   private void FaildAssert(String msg) {
@@ -173,7 +179,7 @@ public class RandomNumberGeneratorTests extends BaseTest {
 		  ret[i][6] = feilds[6]; // precision
 	  }
 	  //System.out.println("read " + ret.length + " TC from " + filename);
-	  Log.FlushInfo("title", " " + ret.length + " TCs in: " + filename);
+	 Log.println(ret.length + " TCs in: " + filename);
     return ret;
   }
     
@@ -200,7 +206,7 @@ public class RandomNumberGeneratorTests extends BaseTest {
     @BeforeTest
     public void beforeTest() {
     	testCount = 0;
-    	Log.Info("title", "RandomNumberGeneratorTest:|  Indx |   low  |  high  |  num | dup | sort | type | per.|");
+    	Log.print("RandomNumberGeneratorTest:|  Indx |   low  |  high  |  num | dup | sort | type | per.|");
     }
     
 
