@@ -7,6 +7,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 import sdk.Date;
+import sdk.DateType;
+
 
 public class DateDiffPage extends BasePage {
 
@@ -14,65 +16,34 @@ public class DateDiffPage extends BasePage {
 		super(driver, "https://www.calculator.net/date-calculator.html");
 	}
 	
-	public boolean fillStartDate(Date date) {
-		clearYear(getStartYear());
-		getStartYear().sendKeys(date.getYear());
-		getStartMonth().selectByVisibleText(date.getMonth());
-		getStartDay().selectByVisibleText(date.getDay());
-		
-		return validateStartDateInsertion(date);
+	public boolean setDate(DateType type, Date date) {
+		try {
+			markYear(type);
+			getYear(type).sendKeys(date.getYear());
+			getMonth(type).selectByVisibleText(date.getMonth());
+			getDay(type).selectByVisibleText(date.getDay());
+			return true;
+		}
+		catch (org.openqa.selenium.NoSuchElementException e) {
+			return false;
+		}
 	}
 	
-	public boolean fillEndDate(Date date) {
-		clearYear(getEndYear());
-		getEndYear().sendKeys(date.getYear());
-		getEndMonth().selectByVisibleText(date.getMonth());
-		getEndDay().selectByVisibleText(date.getDay());
-		
-		return validateEndDateInsertion(date);
-	}
-	
-	private boolean validateStartDateInsertion(Date date) {
-		return  date.getDay().contentEquals(getStartDay().getAllSelectedOptions().get(0).getText()) &&
-				date.getMonth().contentEquals(getStartMonth().getAllSelectedOptions().get(0).getText()) &&
-				date.getYear().contentEquals(getStartYear().getText());
-	}
-	
-	private boolean validateEndDateInsertion(Date date) {
-		return  date.getDay().contentEquals(getEndDay().getAllSelectedOptions().get(0).getText()) &&
-				date.getMonth().contentEquals(getEndMonth().getAllSelectedOptions().get(0).getText()) &&
-				date.getYear().contentEquals(getEndYear().getText());
-	}
-	
-	private void clearYear(WebElement we) {
+	private void markYear(DateType type) {
 		Actions action = new Actions(driver);
-		action.doubleClick(we);
-		we.sendKeys("");
+		action.doubleClick(getYear(type)).perform();
 	}
 	
-	
-	private Select getStartDay() {
-		return new Select(driver.findElement(By.id("today_Day_ID")));
+	private Select getDay(DateType type) { 
+		return new Select(driver.findElement(By.id(type + "_Day_ID")));
 	}
 	
-	private Select getStartMonth() {
-		return new Select(driver.findElement(By.id("today_Month_ID")));
+	private Select getMonth(DateType type) {
+		return new Select(driver.findElement(By.id(type + "_Month_ID")));
 	}
 	
-	private WebElement getStartYear() {
-		return driver.findElement(By.id("today_Year_ID"));
-	}
-	
-	private  Select getEndDay() {
-		return new Select(driver.findElement(By.id("ageat_Day_ID")));
-	}
-	
-	private Select getEndMonth() {
-		return new Select(driver.findElement(By.id("ageat_Month_ID")));
-	}
-	
-	private WebElement getEndYear() {
-		return driver.findElement(By.id("ageat_Year_ID"));
+	private WebElement getYear(DateType type) {
+		return driver.findElement(By.id(type + "_Year_ID"));
 	}
 	
 	public WebElement getSubmitButton() {
@@ -85,6 +56,14 @@ public class DateDiffPage extends BasePage {
 	
 	public String getResult() {
 		return driver.findElement(By.xpath("//*[@id=\"content\"]/div[2]")).getText();
+	}
+	
+	public void setAddendday(boolean flag) {
+		WebElement ckbox = driver.findElement(By.id("addendday"));
+		if(ckbox.isSelected() != flag) {
+			ckbox.click();
+		}
+			
 	}
 
 }

@@ -25,7 +25,7 @@ public class BaseTest {
 	
 	@AfterSuite
 	  public void afterSuite() {
-		  driver.close();
+		  //driver.close();
 		  Log.println("driver closed");
 	  }
 
