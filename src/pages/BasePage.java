@@ -1,6 +1,8 @@
 package pages;
 
 import org.openqa.selenium.chrome.ChromeDriver;
+
+import sdk.Log;
 /**
  * 
  * {@code #BasePage(ChromeDriver, String)} represents a basic web page API to inherit from.
@@ -12,13 +14,22 @@ public class BasePage {
 	ChromeDriver driver;
 	String url;
 	
-	BasePage(ChromeDriver driver, String url) {
-		this.driver =driver;
+	BasePage(String url) {
+		System.setProperty("webdriver.chrome.driver","chromedriver77.exe");
+		this.driver = new ChromeDriver();
+		Log.println("driver initialize");
 		this.url = url;
 	}
 	
+	// navigate the driver to open the url
 	public void openPage() {
 		this.driver.navigate().to(url);
+	}
+	
+	
+	public void finalize() {
+		this.driver.close();
+		Log.println("driver closed");
 	}
 
 }

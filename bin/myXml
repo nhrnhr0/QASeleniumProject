@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-
-<suite parallel="false" name="all tests">
-  <test name="date difference tests">
-    <classes>
-      <class name="tests.DeateDifferenceTests.DateDifference_HardCoded_Sanity_Test"/>
-    </classes>
-  </test> <!-- Test -->
-</suite> <!-- Suite -->
-
-
-<?xml version="1.0" encoding="UTF-8"?>
-<suite name="example suite 1" verbose="1" >
-  <test name="Regression suite 1" >
+<suite name="all tests" verbose="1" >
+  <test name="dateDiff test" >
     <classes>
       <class name="tests.DateDifferenceTests"/>
     </classes>
+ </test>
+ <test name="randGen test">
+ 	<classes>
+ 		<class name="tests.RandomNumberGeneratorTests"/>
+ 	</classes>
  </test>
 </suite>

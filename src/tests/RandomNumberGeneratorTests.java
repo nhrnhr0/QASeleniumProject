@@ -33,41 +33,51 @@ import java.util.*;
 import java.nio.charset.StandardCharsets; 
 import java.nio.file.*; 
 import java.io.*; 
-
+/**
+ * all the tests made for random-number-generator page from {@link https://www.calculator.net/random-number-generator.html}
+ */
 public class RandomNumberGeneratorTests extends BaseTest {
-	private int testCount;
-	RNGPage page;
+	private int testCount; // for debug and log
+	RNGPage page; // the tested page
 	
+	// init the page
     @BeforeSuite
     public void beforeSuite() {
-  	  page = new RNGPage(driver);
+  	  page = new RNGPage();
     }
 	
-	
+	// every test case, reopen the page
   @BeforeMethod
   public void beforeMethod() {
 	  page.openPage();
   }
-  
-  /// node: there is no precision and int/decimal selection tests 
+
+  /**
+   * test the result for a given parameters
+   * O(N^2) for the duplicates check
+   * @param pLowerLimit lower limit
+   * @param pUpperLimit upper limit
+   * @param pGenerateNum number of numbers to generate
+   * @param allowDup true if duplicates is allowed, false if duplicates is not allowed
+   * @param sortType Ascend/Descend/None
+   * @param useIntType true to use integer type, false to use decimal type
+   * @param precision how many numbers will be shown after the dot, useIntType must be false, otherwise the value is ignored
+   */
   @Test(dataProvider = "RandomNumberGeneratorDataProvider")
   public void RandomNumberGeneratorTest(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
 		  						   String sortType, boolean useIntType, String precision) {
 	  ++testCount;
-	  //LogTest(pLowerLimit, pUpperLimit,pGenerateNum, allowDup, sortType, useIntType, precision, testCount);
-	  Log.println(formatTestPars(
-			  pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision, testCount)
-			  + "[RUNNING]");
+	  Log.print(formatTestPars(
+			  pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision, testCount));
+	  
 	  fillFeilds(pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision);
 	  page.submit();
 	  List<WebElement> results = page.getResults();
 	  
 	  // verify the number of results
-	  sa.assertEquals(results.size(), pGenerateNum, "incorrect number of results: "); 
+	  Assert.assertEquals(results.size(), pGenerateNum, "incorrect number of results: "); 
 	  
-	  		
-	  boolean isAscend = true;
-	  boolean isDescend = true;
+	  // for every result:
 	  for(int i = 0; i < results.size();i++) {
 		  double currResult = Double.parseDouble(results.get(i).getText());
 		  
@@ -87,14 +97,11 @@ public class RandomNumberGeneratorTests extends BaseTest {
 		  // if(not in the last result)
 		  // need to check if the next result is in some kind of order
 		  if(i != (results.size()-1)) {
-			  double nextResult = Double.parseDouble(results.get(i).getText());
+			  double nextResult = Double.parseDouble(results.get(i).getText()); 
 			  if(currResult < nextResult) {
-				  //isDescend = false;
 				  Assert.assertEquals(sortType.contentEquals("Descend")?true:false, false, "the result is not in desending order");
 			  }else if(currResult > nextResult) {
-				  //isAscend = false;
 				  Assert.assertEquals(sortType.contentEquals("Ascend")?true:false, false, "the result is not in ascending order");
-				  
 			  }
 			  
 			  // iterate all the next results to find match results for dup test
@@ -110,11 +117,13 @@ public class RandomNumberGeneratorTests extends BaseTest {
 			  
 		  } // done if(not in the last result) 
 	  } // done iterate results 
-	  Log.println(formatTestPars(
-			  pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision, testCount)
-			  + "[PASSED]");
+	  Log.println("[PASSED]");
   } // done test
   
+  
+  /**
+   * formats the test parameters for nice printing
+   */
   private String formatTestPars(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
 			   String sortType, boolean useIntType, String precision, int testCount) {
 	  
@@ -124,13 +133,14 @@ public class RandomNumberGeneratorTests extends BaseTest {
   }
   
   private void FaildAssert(String msg) {
-	  Assert.assertEquals(true, false, msg);
+	  Assert.fail(msg);
   }
   
   
   public void fillFeilds(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
 		  						   String sortType, boolean useIntType, String precision) {
 	  page.clearAll();
+	  // sets the used type (int/decimal) and the upper and lower limits
 	  if(useIntType) {
 		  page.selectInteger();
 		  page.getLowerLimitFeild().sendKeys(String.valueOf((int)pLowerLimit));
@@ -141,15 +151,17 @@ public class RandomNumberGeneratorTests extends BaseTest {
 		  page.getLowerLimitFeild().sendKeys(String.valueOf(pLowerLimit));
 		  page.getUpperLimitFeild().sendKeys(String.valueOf(pUpperLimit));
 		  page.getPrecisionFeild().clear();
-		  page.getPrecisionFeild().sendKeys(precision);
+		  page.getPrecisionFeild().sendKeys(precision); // set precision if on decimal
 	  }
+	  // set the number of generated numbers and press tab for more options
 	  page.getGenerateNumFeild().clear();
 	  page.getGenerateNumFeild().sendKeys(String.valueOf(pGenerateNum));  
 	  page.getGenerateNumFeild().sendKeys(Keys.TAB); // open new opens in-case that generate number is grater then 1
 	  if(pGenerateNum > 1) {
 		  
-		  // set the correct sort
+		  // set allow duplications:
 		  page.setAllowDuplication(allowDup);
+		  // set the correct sort type:
 		  if(sortType.contentEquals("Ascend")) {
 			  page.setSortAscend();
 		  }else if(sortType.contentEquals("Descend")) {
@@ -160,6 +172,15 @@ public class RandomNumberGeneratorTests extends BaseTest {
 	  }
   }
 
+  
+  /**
+   * reads all the test cases from a text file in this format:
+   * lines example:
+   * lowLim,highLim,num,allowDup,sort,useInt,precision
+   * 200,300,1,False,Ascend,True,22
+   * 200,300,1,False,Ascend,True,99
+   * 200,300,1,False,Ascend,False,1
+   */
   @DataProvider
   public Object[][] RandomNumberGeneratorDataProvider() {
 	  final String filename =  "RandomNumberGeneratorDataSet.txt";
@@ -184,7 +205,11 @@ public class RandomNumberGeneratorTests extends BaseTest {
   }
     
     
-    
+    /**
+     * reads the entire file and put it into a list, every entry is a line
+     * @param fileName
+     * @return
+     */
     public List<String> readFileInList(String fileName)  { 
     
       List<String> lines = Collections.emptyList(); 
@@ -203,6 +228,8 @@ public class RandomNumberGeneratorTests extends BaseTest {
       return lines; 
     }
     
+    
+    // prints the test's headline
     @BeforeTest
     public void beforeTest() {
     	testCount = 0;
