@@ -6,17 +6,27 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
-import sdk.Date;
+import sdk.MyDate;
 import sdk.DateType;
 
-
+/**
+ * The class DateDiffPage representing the "date difference page" from {@link https://www.calculator.net/date-calculator.html}
+ * in a nice helpful API
+ */
 public class DateDiffPage extends BasePage {
 
 	public DateDiffPage(ChromeDriver driver) {
 		super(driver, "https://www.calculator.net/date-calculator.html");
 	}
 	
-	public boolean setDate(DateType type, Date date) {
+	/**
+	 * sets a given date in the requested place 
+	 * @param type either {@code DateType.START} or {@code DateType.END}
+	 * @param date the date to enter
+	 * @return {@code true} if the date is valid and inserted, {@code false} otherwise.
+	 */
+	
+	public boolean setDate(DateType type, MyDate date) {
 		try {
 			markYear(type);
 			getYear(type).sendKeys(date.getYear());
@@ -24,7 +34,7 @@ public class DateDiffPage extends BasePage {
 			getDay(type).selectByVisibleText(date.getDay());
 			return true;
 		}
-		catch (org.openqa.selenium.NoSuchElementException e) {
+		catch (org.openqa.selenium.NoSuchElementException | java.lang.IllegalArgumentException e) {
 			return false;
 		}
 	}

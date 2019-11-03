@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite parallel="false" name="Suite">
-  <test name="Test">
+
+
+<suite parallel="false" name="all tests">
+  <test name="date difference tests">
     <classes>
-      <class name="tests.BaseTest"/>
+      <class name="tests.DeateDifferenceTests.DateDifference_HardCoded_Sanity_Test"/>
     </classes>
   </test> <!-- Test -->
 </suite> <!-- Suite -->
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="example suite 1" verbose="1" >
+  <test name="Regression suite 1" >
+    <classes>
+      <class name="tests.DateDifferenceTests"/>
+    </classes>
+ </test>
+</suite>

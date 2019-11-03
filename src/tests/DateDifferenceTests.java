@@ -1,5 +1,7 @@
 package tests;
 
+import java.lang.reflect.Executable;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -8,8 +10,9 @@ import org.testng.annotations.Test;
 
 import pages.DateDiffPage;
 import pages.RNGPage;
-import sdk.Date;
+import sdk.MyDate;
 import sdk.DateType;
+import sdk.Log;
 
 public class DateDifferenceTests extends BaseTest{
 	public static final String RESULT_INVALID = "result invalid";
@@ -28,18 +31,20 @@ public class DateDifferenceTests extends BaseTest{
   }
   
   
-  @Test(dataProvider = "DateDifferenceHardCodedSanityDataProvider")
-	public void DateDifferenceHardCodedSanityTest(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
+  @Test(dataProvider = "DateDifference_HardCoded_Sanity_DataProvider", enabled = true)
+	public void DateDifference_HardCoded_Sanity_Test(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
+	  
 	  runTest(sDay, sMonth, sYear, eDay, eMonth, eYear, addendday, expectedResult);
 	}
   
-  @Test(dataProvider = "DateDifferenceHardCodedEdgeCasesDataProvider")
-  public void DateDifferenceHardCodedEdgeCasesDataTest(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
+  @Test(dataProvider = "DateDifference_HardCoded_EdgeCases_DataProvider", enabled = true)
+  public void DateDifference_HardCoded_EdgeCases_Test(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
 	  runTest(sDay, sMonth, sYear, eDay, eMonth, eYear, addendday, expectedResult);
   }
+  
   private void runTest(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
-	  Date startDate = new Date(sDay, sMonth, sYear);
-		Date endDate = new Date(eDay, eMonth, eYear);
+	  MyDate startDate = new MyDate(sDay, sMonth, sYear);
+		MyDate endDate = new MyDate(eDay, eMonth, eYear);
 		
 		boolean expectValidResult;
 		
@@ -50,14 +55,14 @@ public class DateDifferenceTests extends BaseTest{
 			page.getSubmitButton().click();
 			Assert.assertEquals(page.getResultHeadline(), String.format("Difference between %s and %s:", startDate.toString(), endDate.toString()));
 			
-			Assert.assertEquals(page.getResult(), expectedResult);
+			Assert.assertEquals(page.getResult().replace("\n","").replace("\r", ""), expectedResult.replace("\n","").replace("\r", ""));
 		}else {
 			Assert.assertEquals(RESULT_INVALID, expectedResult);
 		}
   }
 	
 	@DataProvider
-	public Object[][] DateDifferenceHardCodedSanityDataProvider() {
+	public Object[][] DateDifference_HardCoded_Sanity_DataProvider() {
 		Object[][] ret = new Object[][] {
 			{"21","Nov","1997", "30","Oct","2019", false, "21 years 11 months 9 days\n" + 
 					"or 263 months 9 days\n" + 
@@ -73,7 +78,7 @@ public class DateDifferenceTests extends BaseTest{
 	}
 	
 	@DataProvider
-	public Object[][] DateDifferenceHardCodedEdgeCasesDataProvider() {
+	public Object[][] DateDifference_HardCoded_EdgeCases_DataProvider() {
 		Object[][] ret = new Object[][] {
 			{"1","1","2000","2","1","2000", false, "1 calendar days\n\r"},
 			{"1","1","2000","2","1","2000", true, "2 calendar days\n"},
@@ -91,7 +96,6 @@ public class DateDifferenceTests extends BaseTest{
 													"or 12 months 1 days\n" + 
 													"or 52 weeks 3 days\n" + 
 													"or 367 calendar days"}
-
 		};
 		return ret;
 	}
