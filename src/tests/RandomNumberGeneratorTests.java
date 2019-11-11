@@ -23,6 +23,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.AfterTest;
@@ -117,8 +118,17 @@ public class RandomNumberGeneratorTests extends BaseTest {
 			  
 		  } // done if(not in the last result) 
 	  } // done iterate results 
-	  Log.println("[PASSED]");
+	  //Log.println("[PASSED]");
   } // done test
+  
+  @AfterMethod
+  public void afterMethod(ITestResult result) {
+	  if(result.isSuccess()) {
+		  Log.println(" [PASSED]");
+	  }else {
+		  Log.println(" [FAILED]");
+	  }
+  }
   
   
   /**

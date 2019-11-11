@@ -29,6 +29,10 @@ public class BaseTest {
 
 	}
 
+	@AfterSuite
+	public void baseTestAfterSuite() {
+		Log.close();
+	}
 	
 	
 }

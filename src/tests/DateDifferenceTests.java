@@ -35,10 +35,12 @@ public class DateDifferenceTests extends BaseTest{
 	// before every test case, reopen the page 
   @BeforeMethod
   public void beforeMethod(java.lang.reflect.Method m, Object[] params) {
-	  Log.print("run: " + m.getName() + "(" + 
-			  new MyDate((String)params[0], (String)params[1], (String)params[2]).toString() + 
-			  ")-(" +
-			  new MyDate((String)params[3], (String)params[4], (String)params[5]).toString() + ")");
+	  
+	  Log.print("run: " + m.getName() + 
+			  "(" + (String)params[0] + ", " + (String)params[1] + ", " + (String)params[2].toString() + ")" + 
+			  "-(" + (String)params[3] + ", " + (String)params[4] + ", " + (String)params[5].toString() + ")" + 
+			  " add end day: " + ((boolean)params[6] == true?"true":"false"));
+	  
 	  page.openPage();
   }
   

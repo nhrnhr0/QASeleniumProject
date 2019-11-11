@@ -7,9 +7,9 @@
         <methods>
           <include name="beforeSuite"/>
           <include name="baseTestBeforeSuite"/>
-          <include name="beforeTest"/>
           <include name="afterMethod"/>
           <include name="DateDifference_HardCoded_Sanity_Test"/>
+          <include name="baseTestAfterSuite"/>
           <include name="beforeMethod"/>
         </methods>
       </class> <!-- tests.DateDifferenceTests -->
