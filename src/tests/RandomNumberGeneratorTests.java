@@ -64,61 +64,68 @@ public class RandomNumberGeneratorTests extends BaseTest {
    * @param useIntType true to use integer type, false to use decimal type
    * @param precision how many numbers will be shown after the dot, useIntType must be false, otherwise the value is ignored
    */
-  @Test(dataProvider = "RandomNumberGeneratorDataProvider")
+  @Test(dataProvider = "RandomNumberGeneratorDataProvider", alwaysRun = true)
   public void RandomNumberGeneratorTest(double pLowerLimit, double pUpperLimit, int pGenerateNum, boolean allowDup,
 		  						   String sortType, boolean useIntType, String precision) {
-	  ++testCount;
-	  Log.print(formatTestPars(
-			  pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision, testCount));
-	  
-	  fillFeilds(pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision);
-	  page.submit();
-	  List<WebElement> results = page.getResults();
-	  
-	  // verify the number of results
-	  Assert.assertEquals(results.size(), pGenerateNum, "incorrect number of results: "); 
-	  
-	  // for every result:
-	  for(int i = 0; i < results.size();i++) {
-		  double currResult = Double.parseDouble(results.get(i).getText());
+	  try {
+		  ++testCount;
+		  Log.print(formatTestPars(
+				  pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision, testCount));
 		  
-		// if out of bounds 
-		  if(pLowerLimit > currResult || pUpperLimit < currResult) {
-			  FaildAssert("result: " + String.valueOf(currResult) + " is out of bounds: " + pLowerLimit + " - " + pUpperLimit);
-		  }
+		  fillFeilds(pLowerLimit, pUpperLimit, pGenerateNum, allowDup, sortType, useIntType, precision);
+		  page.submit();
+		  List<WebElement> results = page.getResults();
 		  
-		  // test precision
-		  if(!useIntType) {
-			  String afterPoint = results.get(i).getText().substring(results.get(i).getText().indexOf(".")+1);
-			  Assert.assertEquals(afterPoint.length(), Double.parseDouble(precision));
-		  }
+		  // verify the number of results
+		  Assert.assertEquals(results.size(), pGenerateNum, "incorrect number of results: "); 
 		  
-		  
-		  
-		  // if(not in the last result)
-		  // need to check if the next result is in some kind of order
-		  if(i != (results.size()-1)) {
-			  double nextResult = Double.parseDouble(results.get(i).getText()); 
-			  if(currResult < nextResult) {
-				  Assert.assertEquals(sortType.contentEquals("Descend")?true:false, false, "the result is not in desending order");
-			  }else if(currResult > nextResult) {
-				  Assert.assertEquals(sortType.contentEquals("Ascend")?true:false, false, "the result is not in ascending order");
+		  // for every result:
+		  for(int i = 0; i < results.size();i++) {
+			  double currResult = Double.parseDouble(results.get(i).getText());
+			  
+			// if out of bounds 
+			  if(pLowerLimit > currResult || pUpperLimit < currResult) {
+				  FaildAssert("result: " + String.valueOf(currResult) + " is out of bounds: " + pLowerLimit + " - " + pUpperLimit);
 			  }
 			  
-			  // iterate all the next results to find match results for dup test
-			  if(!allowDup) {
-				  for(int j = i+1; j < results.size(); j++) {
-					  double tempResult = Double.parseDouble(results.get(j).getText());
-					  if(tempResult == currResult) {
-						  FaildAssert("found duplicate when not allowed: " + currResult);
-					  }
+			  // test precision
+			  if(!useIntType) {
+				  String afterPoint = results.get(i).getText().substring(results.get(i).getText().indexOf(".")+1);
+				  Assert.assertEquals(afterPoint.length(), Double.parseDouble(precision));
+			  }
+			  
+			  
+			  
+			  // if(not in the last result)
+			  // need to check if the next result is in some kind of order
+			  if(i != (results.size()-1)) {
+				  double nextResult = Double.parseDouble(results.get(i).getText()); 
+				  if(currResult < nextResult) {
+					  Assert.assertEquals(sortType.contentEquals("Descend")?true:false, false, "the result is not in desending order");
+				  }else if(currResult > nextResult) {
+					  Assert.assertEquals(sortType.contentEquals("Ascend")?true:false, false, "the result is not in ascending order");
 				  }
-			  } // done duplicate test
-			  
-			  
-		  } // done if(not in the last result) 
-	  } // done iterate results 
-	  //Log.println("[PASSED]");
+				  
+				  // iterate all the next results to find match results for dup test
+				  if(!allowDup) {
+					  for(int j = i+1; j < results.size(); j++) {
+						  double tempResult = Double.parseDouble(results.get(j).getText());
+						  if(tempResult == currResult) {
+							  FaildAssert("found duplicate when not allowed: " + currResult);
+						  }
+					  }
+				  } // done duplicate test
+				  
+				  
+			  } // done if(not in the last result) 
+		  } // done iterate results 
+	  }catch(Exception ex) {
+		  Log.print(" " + ex.getMessage());
+		  FaildAssert("Exception throwen: " + ex.getMessage());
+	  }catch(Throwable th) {
+		  Log.print(th.getMessage());
+		  FaildAssert("Throwable throwen: " + th.getMessage());
+	  }
   } // done test
   
   @AfterMethod
@@ -144,6 +151,11 @@ public class RandomNumberGeneratorTests extends BaseTest {
   
   private void FaildAssert(String msg) {
 	  Assert.fail(msg);
+  }
+  
+  @AfterSuite
+  public void AfterSuite() {
+	  page.close();
   }
   
   

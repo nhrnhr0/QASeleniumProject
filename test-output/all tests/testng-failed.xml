@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="Failed suite [all tests]">
-  <test thread-count="5" name="dateDiff test(failed)">
+  <test thread-count="5" name="randGen test(failed)">
     <classes>
-      <class name="tests.DateDifferenceTests">
+      <class name="tests.RandomNumberGeneratorTests">
         <methods>
-          <include name="beforeSuite"/>
-          <include name="baseTestBeforeSuite"/>
+          <include name="beforeTest"/>
           <include name="afterMethod"/>
-          <include name="DateDifference_HardCoded_Sanity_Test"/>
-          <include name="baseTestAfterSuite"/>
+          <include name="baseTestBeforeSuite"/>
+          <include name="beforeSuite"/>
           <include name="beforeMethod"/>
+          <include name="AfterSuite"/>
+          <include name="baseTestAfterSuite"/>
+          <include name="RandomNumberGeneratorTest" invocation-numbers="29"/>
         </methods>
-      </class> <!-- tests.DateDifferenceTests -->
+      </class> <!-- tests.RandomNumberGeneratorTests -->
     </classes>
-  </test> <!-- dateDiff test(failed) -->
+  </test> <!-- randGen test(failed) -->
 </suite> <!-- Failed suite [all tests] -->

@@ -23,13 +23,18 @@ public class BasePage {
 	
 	// navigate the driver to open the url
 	public void openPage() {
-		this.driver.navigate().to(url);
+		try {
+			this.driver.navigate().to(url);
+		}catch(Exception ex) {
+			Log.print("openPage error: " + ex.getMessage());
+		}
 	}
 	
 	
-	public void finalize() {
+	public void close() {
 		this.driver.close();
 		Log.println("driver closed");
 	}
+
 
 }

@@ -5,6 +5,7 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
@@ -12,6 +13,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import pages.BasePage;
 import pages.DateDiffPage;
 import pages.RNGPage;
 import sdk.MyDate;
@@ -58,40 +60,57 @@ public class DateDifferenceTests extends BaseTest{
   
   
 //run sanity tests:
- @Test(dataProvider = "DateDifference_HardCoded_Sanity_DataProvider", enabled = true)
+ @Test(dataProvider = "DateDifference_HardCoded_Sanity_DataProvider", enabled = true, alwaysRun = true)
 	public void DateDifference_HardCoded_Sanity_Test(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
 	  runTest(sDay, sMonth, sYear, eDay, eMonth, eYear, addendday, expectedResult);
 	}
   
  
   // run edge cases:
-  @Test(dataProvider = "DateDifference_HardCoded_EdgeCases_DataProvider", enabled = true)
+  @Test(dataProvider = "DateDifference_HardCoded_EdgeCases_DataProvider", enabled = true, alwaysRun = true)
   public void DateDifference_HardCoded_EdgeCases_Test(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
 	  runTest(sDay, sMonth, sYear, eDay, eMonth, eYear, addendday, expectedResult);
   }
   
 
   private void runTest(String sDay,String  sMonth,String  sYear,String  eDay,String  eMonth,String  eYear,boolean addendday, String expectedResult) {
-	  MyDate startDate = new MyDate(sDay, sMonth, sYear);
-		MyDate endDate = new MyDate(eDay, eMonth, eYear);
-		
-		// true if both dates are valid, false otherwise
-		boolean expectValidResult = page.setDate(DateType.START, startDate) && page.setDate(DateType.END, endDate);
-		page.setAddendday(addendday);
-		
-		// if both dates are valid, click the submit button and test the result:
-		if(expectValidResult) {
-			page.getSubmitButton().click(); 
+	  try {
+		  MyDate startDate = new MyDate(sDay, sMonth, sYear);
+			MyDate endDate = new MyDate(eDay, eMonth, eYear);
 			
-			// make sure we test for the right thing, test that the result headline is equal to the given dates
-			Assert.assertEquals(page.getResultHeadline(), String.format("Difference between %s and %s:", startDate.toString(), endDate.toString()));
+			// true if both dates are valid, false otherwise
+			boolean expectValidResult = page.setDate(DateType.START, startDate) && page.setDate(DateType.END, endDate);
+			page.setAddendday(addendday);
 			
-			// make sure the date difference is as expected by the expectedResult (ignore \n and \r)
-			Assert.assertEquals(page.getResult().replace("\n","").replace("\r", ""), expectedResult.replace("\n","").replace("\r", ""));
-		}else {
-			// if one of the dates is invalid, then we expect for an invalid result
-			Assert.assertEquals(RESULT_INVALID, expectedResult);
-		}
+			// if both dates are valid, click the submit button and test the result:
+			if(expectValidResult) {
+				page.getSubmitButton().click(); 
+				
+				// make sure we test for the right thing, test that the result headline is equal to the given dates
+				Assert.assertEquals(page.getResultHeadline(), String.format("Difference between %s and %s:", startDate.toString(), endDate.toString()));
+				
+				// make sure the date difference is as expected by the expectedResult (ignore \n and \r)
+				Assert.assertEquals(page.getResult().replace("\n","").replace("\r", ""), expectedResult.replace("\n","").replace("\r", ""));
+			}else {
+				// if one of the dates is invalid, then we expect for an invalid result
+				Assert.assertEquals(RESULT_INVALID, expectedResult);
+			}
+	  }catch(Exception ex) {
+		  Log.print(" " + ex.getMessage());
+		  FaildAssert("Exception throwen: " + ex.getMessage());
+	  }catch(Throwable th) {
+		  Log.print(th.getMessage());
+		  FaildAssert("Throwable throwen: " + th.getMessage());
+	  }
+  }
+  
+  @AfterSuite
+  public void AfterSuite() {
+	  page.close();
+  }
+  
+  private void FaildAssert(String msg) {
+	  Assert.fail(msg);
   }
 	
 	@DataProvider

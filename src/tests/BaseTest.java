@@ -31,6 +31,7 @@ public class BaseTest {
 
 	@AfterSuite
 	public void baseTestAfterSuite() {
+		Log.println("closeing log file");
 		Log.close();
 	}
 	
